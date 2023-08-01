@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Google Sheets Data</title>
+</head>
+<body>
+    <h1>Google Sheets Data</h1>
+    <div id="data-container"></div>
+    <script>
+        // Replace with your Client ID
+        const CLIENT_ID = '955224515782-omdd7cg9m6gfhvnfr2asiu23hnp0pqaq.apps.googleusercontent.com';
+
+        // Authorization scopes (assuming you want read access to the sheet)
+        const SCOPES = 'https://www.googleapis.com/auth/spreadsheets.readonly';
+
+        // Google Sheets API endpoint
+        const API_ENDPOINT = 'https://sheets.googleapis.com/v4/spreadsheets/1_fSbWQnIc57uuveB2pxmt0UNI6shG8rKS2RlQNoXF1o/values/e_kyc_ko_farmer!A:K';
+
+        function handleClientLoad() {
+            gapi.load('client:auth2', initClient);
+        }
+
+        function initClient() {
+            gapi.client.init({
+                clientId: CLIENT_ID,
+                scope: SCOPES
+            }).then(function () {
+                gapi.auth2.getAuthInstance().signIn().then(function () {
+                    getData();
+                });
+            }, function (error) {
+                console.log(error);
+            });
+        }
+
+        function getData() {
+            gapi.client.request({
+                path: API_ENDPOINT
+            }).then(function (response) {
+                const data = response.result.values;
+                const container = document.getElementById('data-container');
+                if (data && data.length > 0) {
+                    let html = '<table>';
+                    data.forEach(row => {
+                        html += '<tr>';
+                        row.forEach(cell => {
+                            html += `<td>${cell}</td>`;
+                        });
+                        html += '</tr>';
+                    });
+                    html += '</table>';
+                    container.innerHTML = html;
+                } else {
+                    container.innerHTML = 'No data found.';
+                }
+            }, function (error) {
+                console.log(error);
+            });
+        }
+    </script>
+    <script src="https://apis.google.com/js/api.js?onload=handleClientLoad"></script>
+</body>
+</html>
